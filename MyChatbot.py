@@ -4,6 +4,10 @@
 # Provide Hyperlink sections and redirect to the following sections
 # Section as follows: Projects or Education or Accompliments or Work Experience
 
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
 responses = {
     "hi": "Hello!",
     "how are you": "I'm good, thanks for asking!",
@@ -14,17 +18,20 @@ responses = {
     "stop": "Exiting chatbot."
 }
 
+@app.route('/', methods=['GET', 'POST'])
 def chatbot():
-    print("Welcome to the chatbot. Type 'help' for a list of commands.")
-    while True:
-        user_input = input("You: ").lower()
+    if request.method == 'POST':
+        user_input = request.form['user_input'].lower()
         if user_input in responses:
-            if user_input == "stop":
-                print("Bot: " + responses[user_input])
-                break
-            print("Bot: " + responses[user_input])
+            return jsonify({"response": responses[user_input]})
         else:
-            print("Bot: I'm sorry, I didn't understand your input. Type 'help' for a list of commands.")
+            return jsonify({"response": "I'm sorry, I didn't understand your input. Type 'help' for a list of commands."})
+    return '''
+        <form method="post">
+            <input type="text" name="user_input">
+            <input type="submit" value="Submit">
+        </form>
+    '''
 
-chatbot()
-
+if __name__ == '__main__':
+    app.run(debug=True)
